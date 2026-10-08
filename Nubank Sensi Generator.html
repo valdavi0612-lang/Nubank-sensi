@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nubank Sensi | By @delk1ng</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        nu: {
+                            purple: '#820ad1',
+                            darkPurple: '#4c0677',
+                            lightPurple: '#a855f7',
+                            neon: '#c084fc',
+                            glow: '#d8b4fe',
+                            bg: '#0a0512',
+                            card: '#130826',
+                            border: '#2e1252',
+                            accent: '#e9d5ff'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        gamer: ['Orbitron', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'neon-nu': '0 0 20px rgba(130, 10, 209, 0.5), 0 0 40px rgba(168, 85, 247, 0.25)',
+                        'glow-purple': '0 0 30px rgba(168, 85, 247, 0.35)',
+                        'glow-green': '0 0 20px rgba(34, 197, 94, 0.3)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0512;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(130, 10, 209, 0.28) 0%, transparent 65%),
+                radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .text-neon-nu {
+            background: linear-gradient(135deg, #ffffff 0%, #c084fc 50%, #820ad1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(12px) scale(0.95); }
+            20% { opacity: 1; transform: translateY(0) scale(1); }
+            80% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-12px) scale(1.05); }
+        }
+
+        .animate-intro-text {
+            animation: fadeInOut 0.95s ease-in-out forwards;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0512;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e1252;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #820ad1;
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between min-h-screen p-4 md:p-8 relative selection:bg-nu-purple selection:text-white">
+
+    <!-- OVERLAY BACKGROUND GLOW -->
+    <div class="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-nu-purple/15 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="max-w-5xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 pb-6 z-20 border-b border-nu-border/50 mb-6">
+        <div class="text-center sm:text-left">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-nu-card border border-nu-border text-nu-neon text-[11px] font-semibold tracking-wider uppercase mb-1.5 shadow-neon-nu">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-nu-neon"></i> SENSI ENGINE BY @DELK1NG
+            </div>
+            <h1 class="text-2xl md:text-3xl font-black font-gamer tracking-wider text-white">
+                NUBANK <span class="text-neon-nu">SENSI</span>
+            </h1>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="switchMode('user')" id="btn-mode-user" class="px-4 py-2 rounded-xl font-bold text-xs font-gamer tracking-wider uppercase transition-all flex items-center gap-2 border border-nu-purple bg-nu-purple/20 text-white shadow-neon-nu">
+                <i data-lucide="smartphone" class="w-4 h-4"></i> Gerador de Sensi
+            </button>
+            <button onclick="switchMode('admin')" id="btn-mode-admin" class="px-4 py-2 rounded-xl font-bold text-xs font-gamer tracking-wider uppercase transition-all flex items-center gap-2 border border-nu-border bg-nu-card text-gray-400 hover:text-white hover:border-nu-purple">
+                <i data-lucide="key" class="w-4 h-4"></i> Gerador de Keys (Admin)
+            </button>
+        </div>
+    </header>
+
+    <!-- SEÇÃO CLIENTE (GERADOR DE SENSI FLUXO) -->
+    <div id="section-user-flow" class="w-full flex-grow flex flex-col justify-center">
+        
+        <!-- TELA 1: INÍCIO / LANDING -->
+        <main id="screen-home" class="max-w-md mx-auto w-full my-auto z-10 transition-all duration-500">
+            <div class="bg-nu-card border border-nu-border rounded-3xl p-8 text-center shadow-neon-nu relative overflow-hidden">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-nu-purple/30 rounded-full blur-2xl"></div>
+
+                <div class="w-20 h-20 bg-nu-purple/20 border border-nu-purple/40 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow-purple">
+                    <i data-lucide="crosshair" class="w-10 h-10 text-nu-neon"></i>
+                </div>
+
+                <h2 class="text-2xl font-bold font-gamer text-white mb-2">Nubank Sensi</h2>
+                <p class="text-gray-400 text-xs md:text-sm mb-8 leading-relaxed">
+                    Sua sensibilidade calibrada exatamente para a <span class="text-nu-neon font-semibold">Resolução Real</span> do seu celular e com <span class="text-nu-neon font-semibold">Auxílio de Mira</span>.
+                </p>
+
+                <div class="space-y-3">
+                    <button onclick="startIntroSequence()" class="w-full py-4 px-6 rounded-2xl font-gamer font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-nu-purple via-nu-darkPurple to-nu-purple bg-[length:200%_auto] hover:bg-right text-white shadow-neon-nu hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3">
+                        <i data-lucide="play" class="w-4 h-4 fill-white"></i> Iniciar Gerador
+                    </button>
+
+                    <button onclick="switchMode('admin')" class="w-full py-3 px-6 rounded-2xl font-gamer font-bold text-xs uppercase tracking-wider bg-nu-bg border border-nu-border hover:border-nu-purple text-gray-300 hover:text-white transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="key-round" class="w-4 h-4 text-nu-neon"></i> Painel Gerador de Keys
+                    </button>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-nu-border/60 text-xs text-gray-500 font-mono">
+                    Criado por <span class="text-nu-neon font-bold">@delk1ng</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- TELA 2: INTRO ANIMADA (1s por frase) -->
+        <main id="screen-intro" class="hidden max-w-lg mx-auto w-full my-auto text-center z-10">
+            <div class="bg-nu-card/90 border border-nu-purple/50 rounded-3xl p-10 shadow-neon-nu backdrop-blur-xl min-h-[260px] flex flex-col justify-center items-center relative">
+                <div id="intro-text-container" class="w-full">
+                    <!-- Frases dinâmicas inseridas via JS -->
+                </div>
+
+                <div class="absolute bottom-4 text-xs text-gray-400 font-mono">
+                    Criado por <span class="text-nu-neon font-bold">@delk1ng</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- TELA 3: AUTENTICAÇÃO DE KEY -->
+        <main id="screen-key" class="hidden max-w-md mx-auto w-full my-auto z-10 transition-all duration-500">
+            <div class="bg-nu-card border border-nu-border rounded-3xl p-8 shadow-neon-nu relative">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-nu-border">
+                    <div class="p-3 bg-nu-purple/20 rounded-xl text-nu-neon border border-nu-purple/30">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div class="text-left">
+                        <h2 class="text-lg font-bold font-gamer text-white">Chave de Acesso</h2>
+                        <p class="text-xs text-gray-400">Insira sua key para acessar o gerador</p>
+                    </div>
+                </div>
+
+                <form onsubmit="verifyKey(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-300 mb-2 tracking-wider text-left">
+                            Digitar Key
+                        </label>
+                        <input type="text" id="keyInput" placeholder="Ex: DELKING-VIP ou NUBANK-2H-XXXX" 
+                            class="w-full bg-nu-bg border border-nu-border rounded-xl p-3.5 text-sm font-mono text-white placeholder-gray-600 focus:outline-none focus:border-nu-purple focus:ring-1 focus:ring-nu-purple transition-all text-center tracking-widest uppercase">
+                    </div>
+
+                    <div id="keyError" class="hidden p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-red-400 text-xs text-center font-medium">
+                        <!-- Mensagem de erro dinâmica -->
+                    </div>
+
+                    <button type="submit" class="w-full py-4 rounded-xl font-gamer font-bold text-xs uppercase tracking-wider bg-nu-purple hover:bg-nu-darkPurple text-white shadow-neon-nu active:scale-95 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="unlock" class="w-4 h-4"></i> Validar e Entrar
+                    </button>
+                </form>
+
+                <div class="mt-6 p-4 rounded-2xl bg-nu-purple/10 border border-nu-purple/20 text-xs text-left text-gray-300 leading-relaxed">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <p class="font-bold text-nu-neon flex items-center gap-1.5">
+                            <i data-lucide="key-round" class="w-4 h-4"></i> Teste com a Key Mestra:
+                        </p>
+                    </div>
+                    <p class="text-gray-300 font-mono text-xs bg-nu-bg/80 p-2 rounded-lg border border-nu-border text-center select-all">
+                        DELKING-VIP
+                    </p>
+                </div>
+
+                <div class="mt-4 text-center text-xs text-gray-500 font-mono">
+                    Criado por <span class="text-nu-neon font-bold">@delk1ng</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- TELA 4: DASHBOARD DO GERADOR DE SENSI -->
+        <main id="screen-dashboard" class="hidden max-w-5xl mx-auto w-full my-4 z-10 transition-all duration-500">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- PAINEL ESQUERDO: SELEÇÃO, RESOLUÇÃO E AUXÍLIO DE MIRA (5 COLUNAS) -->
+                <div class="lg:col-span-5 bg-nu-card border border-nu-border rounded-3xl p-6 shadow-neon-nu flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-nu-border">
+                            <div class="p-2.5 bg-nu-purple/20 rounded-xl text-nu-neon border border-nu-purple/30">
+                                <i data-lucide="sliders" class="w-5 h-5"></i>
+                            </div>
+                            <div class="text-left">
+                                <h2 class="text-base font-bold font-gamer text-white">Configuração do Celular</h2>
+                                <p class="text-xs text-gray-400">Modelo, resolução e auxílio de toque</p>
+                            </div>
+                        </div>
+
+                        <!-- BUSCA DE CELULARES AUTOCOMPLETE -->
+                        <div class="mb-5 text-left relative">
+                            <label class="block text-xs font-semibold uppercase text-gray-300 mb-2 tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="smartphone" class="w-4 h-4 text-nu-neon"></i> Modelo do Aparelho
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="phoneSearchInput" oninput="filterPhones()" placeholder="Digite Xiaomi, iPhone, Poco, Samsung..." 
+                                    class="w-full bg-nu-bg border border-nu-border rounded-xl p-3 pl-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-nu-purple transition-all">
+                                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3.5 top-3.5"></i>
+                            </div>
+
+                            <div id="phoneDropdown" class="hidden absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-nu-card border border-nu-border rounded-xl shadow-2xl z-50 divide-y divide-nu-border/40">
+                                <!-- Preenchido via JS -->
+                            </div>
+                        </div>
+
+                        <!-- INPUT PARA RESOLUÇÃO ATUAL MANUAL -->
+                        <div class="mb-5 text-left">
+                            <label class="block text-xs font-semibold uppercase text-gray-300 mb-2 tracking-wider flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">
+                                    <i data-lucide="monitor" class="w-4 h-4 text-nu-neon"></i> Resolução Que Você Usa
+                                </span>
+                                <span class="text-[10px] text-nu-neon font-mono lowercase">ex: 1080x2400</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="manualResolutionInput" placeholder="Ex: 1080x2400" value="1080x2400" 
+                                    class="w-full bg-nu-bg border border-nu-border rounded-xl p-3 pl-10 text-sm font-mono text-white placeholder-gray-600 focus:outline-none focus:border-nu-purple transition-all">
+                                <i data-lucide="scaling" class="w-4 h-4 text-gray-500 absolute left-3.5 top-3.5"></i>
+                            </div>
+                        </div>
+
+                        <!-- INTENSIDADE DA SENSI -->
+                        <div class="mb-5 text-left">
+                            <label class="block text-xs font-semibold uppercase text-gray-300 mb-2 tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="gauge" class="w-4 h-4 text-nu-neon"></i> Nível da Sensi
+                            </label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" onclick="setSensiType('alta')" id="btn-sensi-alta" class="sensi-type-btn p-2.5 rounded-xl border border-nu-border bg-nu-bg text-gray-400 font-semibold text-xs transition-all flex flex-col items-center gap-1">
+                                    <span class="text-sm">🔥</span> Alta
+                                    <span class="text-[10px] text-gray-500">(200-175)</span>
+                                </button>
+                                <button type="button" onclick="setSensiType('media')" id="btn-sensi-media" class="sensi-type-btn p-2.5 rounded-xl border border-nu-purple bg-nu-purple/20 text-white font-semibold text-xs transition-all flex flex-col items-center gap-1">
+                                    <span class="text-sm">⚖️</span> Média
+                                    <span class="text-[10px] text-gray-400">(150-130)</span>
+                                </button>
+                                <button type="button" onclick="setSensiType('baixa')" id="btn-sensi-baixa" class="sensi-type-btn p-2.5 rounded-xl border border-nu-border bg-nu-bg text-gray-400 font-semibold text-xs transition-all flex flex-col items-center gap-1">
+                                    <span class="text-sm">🎯</span> Baixa
+                                    <span class="text-[10px] text-gray-500">(120-90)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- NOVO MÓDULO: AUXÍLIO DE MIRA (ASSISTÊNCIA DE TOQUE) -->
+                        <div class="mb-5 text-left p-4 rounded-2xl bg-nu-purple/10 border border-nu-purple/30">
+                            <div class="flex items-center justify-between mb-3">
+                                <label class="text-xs font-bold uppercase text-white tracking-wider flex items-center gap-1.5">
+                                    <i data-lucide="target" class="w-4 h-4 text-nu-neon"></i> Auxílio de Mira (Toque)
+                                </label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="auxilioToggle" checked onchange="toggleAuxilioMira()" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-nu-bg peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nu-purple"></div>
+                                </label>
+                            </div>
+
+                            <div id="auxilioOptionsContainer" class="space-y-2">
+                                <span class="text-[11px] text-gray-400 block mb-1">Intensidade do Auxílio de Resposta:</span>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button type="button" onclick="setAuxilioType('suave')" id="btn-aux-suave" class="aux-type-btn p-2 rounded-xl border border-nu-border bg-nu-bg text-gray-400 font-semibold text-[11px] transition-all flex flex-col items-center gap-0.5">
+                                        <span>Suave</span>
+                                        <span class="text-[9px] text-gray-500">Estabilidade</span>
+                                    </button>
+                                    <button type="button" onclick="setAuxilioType('medio')" id="btn-aux-medio" class="aux-type-btn p-2 rounded-xl border border-nu-purple bg-nu-purple/20 text-white font-semibold text-[11px] transition-all flex flex-col items-center gap-0.5">
+                                        <span>Médio</span>
+                                        <span class="text-[9px] text-gray-400">Equilibrado</span>
+                                    </button>
+                                    <button type="button" onclick="setAuxilioType('extreme')" id="btn-aux-extreme" class="aux-type-btn p-2 rounded-xl border border-nu-border bg-nu-bg text-gray-400 font-semibold text-[11px] transition-all flex flex-col items-center gap-0.5">
+                                        <span>Extreme</span>
+                                        <span class="text-[9px] text-gray-500">Subida Rápida</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <button onclick="generateAdaptedSensi()" class="w-full py-4 rounded-xl font-gamer font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-nu-purple to-nu-lightPurple hover:opacity-90 text-white shadow-neon-nu active:scale-95 transition-all flex items-center justify-center gap-2 mt-2">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> Gerar Sensi & Auxílio
+                    </button>
+                </div>
+
+                <!-- PAINEL DIREITO: RESULTADO ADAPTADO (7 COLUNAS) -->
+                <div class="lg:col-span-7 bg-nu-card border border-nu-border rounded-3xl p-6 shadow-neon-nu flex flex-col justify-between relative">
+                    <div>
+                        <div class="flex items-center justify-between mb-6 pb-4 border-b border-nu-border">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 bg-nu-purple/20 rounded-xl text-nu-neon border border-nu-purple/30">
+                                    <i data-lucide="crosshair" class="w-5 h-5"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h2 class="text-base font-bold font-gamer text-white">Sensi Calculada</h2>
+                                    <p id="resultPhoneModel" class="text-xs text-nu-neon font-semibold">Gere a sensibilidade</p>
+                                </div>
+                            </div>
+                            <button onclick="copyToClipboard()" class="px-3 py-1.5 rounded-lg bg-nu-bg border border-nu-border text-xs text-gray-300 hover:text-white hover:border-nu-purple transition-all flex items-center gap-1.5">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Sensi
+                            </button>
+                        </div>
+
+                        <!-- VALORES DA SENSI -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                            <div class="bg-nu-bg/80 border border-nu-border/80 p-3 rounded-2xl text-left">
+                                <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Geral</span>
+                                <span id="resGeral" class="text-xl font-gamer font-bold text-white">--</span>
+                            </div>
+                            <div class="bg-nu-bg/80 border border-nu-border/80 p-3 rounded-2xl text-left">
+                                <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Red Dot</span>
+                                <span id="resRedDot" class="text-xl font-gamer font-bold text-white">--</span>
+                            </div>
+                            <div class="bg-nu-bg/80 border border-nu-border/80 p-3 rounded-2xl text-left">
+                                <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Mira 2X</span>
+                                <span id="res2x" class="text-xl font-gamer font-bold text-white">--</span>
+                            </div>
+                            <div class="bg-nu-bg/80 border border-nu-border/80 p-3 rounded-2xl text-left">
+                                <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Mira 4X</span>
+                                <span id="res4x" class="text-xl font-gamer font-bold text-white">--</span>
+                            </div>
+                            <div class="bg-nu-bg/80 border border-nu-border/80 p-3 rounded-2xl text-left">
+                                <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">AWM</span>
+                                <span id="resAwm" class="text-xl font-gamer font-bold text-white">--</span>
+                            </div>
+                            <div class="bg-nu-bg/80 border border-nu-border/80 p-3 rounded-2xl text-left">
+                                <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Olhadinha</span>
+                                <span id="resOlhadinha" class="text-xl font-gamer font-bold text-white">--</span>
+                            </div>
+                        </div>
+
+                        <!-- RESULTADOS DO AUXÍLIO DE MIRA E AJUSTES DE SISTEMA -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left mb-3">
+                            <div class="p-3.5 bg-gradient-to-br from-nu-purple/20 to-transparent border border-nu-purple/30 rounded-2xl">
+                                <span class="text-[11px] font-semibold text-gray-400 block uppercase" id="labelDpi">DPI Recomendada</span>
+                                <span id="resDpi" class="text-base font-gamer font-bold text-nu-neon">--</span>
+                            </div>
+                            <div class="p-3.5 bg-gradient-to-br from-nu-purple/20 to-transparent border border-nu-purple/30 rounded-2xl">
+                                <span class="text-[11px] font-semibold text-gray-400 block uppercase">Botão de Atirar</span>
+                                <span id="resBotao" class="text-base font-gamer font-bold text-white">--</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                            <div class="p-3.5 bg-gradient-to-br from-nu-purple/20 to-transparent border border-nu-purple/30 rounded-2xl">
+                                <span class="text-[11px] font-semibold text-gray-400 block uppercase">Velocidade do Ponteiro</span>
+                                <span id="resPonteiro" class="text-xs font-gamer font-bold text-white">--</span>
+                            </div>
+                            <div class="p-3.5 bg-gradient-to-br from-nu-purple/20 to-transparent border border-nu-purple/30 rounded-2xl">
+                                <span class="text-[11px] font-semibold text-gray-400 block uppercase">Atraso ao Pressionar (Touch Delay)</span>
+                                <span id="resDelay" class="text-xs font-gamer font-bold text-nu-neon">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-nu-border/60 text-center text-xs text-gray-500 font-mono">
+                        Criado por <span class="text-nu-neon font-bold">@delk1ng</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SEÇÃO ADMIN (GERADOR DE KEYS) -->
+    <main id="section-admin" class="hidden max-w-5xl mx-auto w-full my-auto z-10 transition-all duration-500">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- FORMULÁRIO DE GERAÇÃO DE KEY (5 COLUNAS) -->
+            <div class="lg:col-span-5 bg-nu-card border border-nu-border rounded-3xl p-6 shadow-neon-nu text-left">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-nu-border">
+                    <div class="p-2.5 bg-nu-purple/20 rounded-xl text-nu-neon border border-nu-purple/30">
+                        <i data-lucide="key-round" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold font-gamer text-white">Criar Nova Key</h2>
+                        <p class="text-xs text-gray-400">Gere licenças com expiração pré-definida</p>
+                    </div>
+                </div>
+
+                <form onsubmit="handleGenerateKey(event)" class="space-y-4">
+                    <!-- SELEÇÃO DE DURAÇÃO -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-300 mb-2 tracking-wider">
+                            Duração da Licença
+                        </label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="setKeyDuration('2h')" id="btn-dur-2h" class="key-dur-btn p-3 rounded-xl border border-nu-purple bg-nu-purple/20 text-white font-semibold text-xs transition-all flex items-center justify-between">
+                                <span>2 Horas</span>
+                                <span class="text-[10px] text-nu-neon font-mono">2H</span>
+                            </button>
+                            <button type="button" onclick="setKeyDuration('1d')" id="btn-dur-1d" class="key-dur-btn p-3 rounded-xl border border-nu-border bg-nu-bg text-gray-400 font-semibold text-xs transition-all flex items-center justify-between">
+                                <span>1 Dia</span>
+                                <span class="text-[10px] text-gray-500 font-mono">24H</span>
+                            </button>
+                            <button type="button" onclick="setKeyDuration('5d')" id="btn-dur-5d" class="key-dur-btn p-3 rounded-xl border border-nu-border bg-nu-bg text-gray-400 font-semibold text-xs transition-all flex items-center justify-between">
+                                <span>5 Dias</span>
+                                <span class="text-[10px] text-gray-500 font-mono">120H</span>
+                            </button>
+                            <button type="button" onclick="setKeyDuration('vitalicio')" id="btn-dur-vitalicio" class="key-dur-btn p-3 rounded-xl border border-nu-border bg-nu-bg text-gray-400 font-semibold text-xs transition-all flex items-center justify-between">
+                                <span>Vitalício</span>
+                                <span class="text-[10px] text-gray-500 font-mono">∞</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PREFIXO DA KEY -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-300 mb-2 tracking-wider">
+                            Prefixo da Key
+                        </label>
+                        <input type="text" id="keyPrefixInput" placeholder="Ex: NUBANK-, DELKING-" value="NUBANK-"
+                            class="w-full bg-nu-bg border border-nu-border rounded-xl p-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-nu-purple uppercase font-mono">
+                    </div>
+
+                    <button type="submit" class="w-full py-4 rounded-xl font-gamer font-bold text-xs uppercase tracking-wider bg-nu-purple hover:bg-nu-darkPurple text-white shadow-neon-nu active:scale-95 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Gerar Key
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-4 border-t border-nu-border/60 text-center text-xs text-gray-500 font-mono">
+                    Criado por <span class="text-nu-neon font-bold">@delk1ng</span>
+                </div>
+            </div>
+
+            <!-- TABELA DE KEYS GERADAS (7 COLUNAS) -->
+            <div class="lg:col-span-7 bg-nu-card border border-nu-border rounded-3xl p-6 shadow-neon-nu flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-nu-border">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-nu-purple/20 rounded-xl text-nu-neon border border-nu-purple/30">
+                                <i data-lucide="database" class="w-5 h-5"></i>
+                            </div>
+                            <div class="text-left">
+                                <h2 class="text-base font-bold font-gamer text-white">Keys Geradas</h2>
+                                <p class="text-xs text-gray-400">Histórico salvo no LocalStorage</p>
+                            </div>
+                        </div>
+                        <button onclick="clearAllKeys()" class="text-xs text-red-400 hover:text-red-300 border border-red-500/30 bg-red-950/30 px-3 py-1.5 rounded-lg transition-all">
+                            Limpar Keys
+                        </button>
+                    </div>
+
+                    <!-- LISTA DINÂMICA DE KEYS -->
+                    <div id="keysTableContainer" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                        <!-- Items inseridos via JS -->
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-nu-border/60 text-center text-xs text-gray-500 font-mono">
+                    Criado por <span class="text-nu-neon font-bold">@delk1ng</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-5xl mx-auto w-full text-center text-xs text-gray-500 z-10 py-4 mt-auto">
+        <p>© 2026 Nubank Sensi System. Criado por <span class="text-nu-neon font-bold">@delk1ng</span></p>
+    </footer>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-nu-card border border-nu-purple text-white px-5 py-3.5 rounded-2xl shadow-neon-nu flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50">
+        <i data-lucide="check-circle" class="w-5 h-5 text-nu-neon"></i>
+        <span id="toastMsg" class="text-xs font-semibold">Notificação</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const phoneDatabase = [
+            // iPhones
+            { name: "iPhone 16 Pro Max", brand: "apple", defaultRes: "1320x2868" },
+            { name: "iPhone 16 Pro", brand: "apple", defaultRes: "1206x2622" },
+            { name: "iPhone 15 Pro Max / 15 Pro", brand: "apple", defaultRes: "1290x2796" },
+            { name: "iPhone 14 / 14 Pro", brand: "apple", defaultRes: "1170x2532" },
+            { name: "iPhone 13 / 13 Pro", brand: "apple", defaultRes: "1170x2532" },
+            { name: "iPhone 12 / 12 Pro", brand: "apple", defaultRes: "1170x2532" },
+            { name: "iPhone 11 / 11 Pro", brand: "apple", defaultRes: "828x1792" },
+            { name: "iPhone XR / XS Max", brand: "apple", defaultRes: "1242x2688" },
+
+            // Xiaomi / Poco / Redmi
+            { name: "Poco X6 Pro / X6", brand: "xiaomi", defaultRes: "1220x2712" },
+            { name: "Poco X3 Pro / X5 Pro", brand: "xiaomi", defaultRes: "1080x2400" },
+            { name: "Poco F5 / F6 Pro", brand: "xiaomi", defaultRes: "1440x3200" },
+            { name: "Xiaomi 14 / 13 Ultra", brand: "xiaomi", defaultRes: "1440x3200" },
+            { name: "Redmi Note 13 Pro", brand: "xiaomi", defaultRes: "1220x2712" },
+            { name: "Redmi Note 12 / 11", brand: "xiaomi", defaultRes: "1080x2400" },
+
+            // Samsung
+            { name: "Samsung Galaxy S24 Ultra", brand: "samsung", defaultRes: "1440x3120" },
+            { name: "Samsung Galaxy S23 / S23 FE", brand: "samsung", defaultRes: "1080x2340" },
+            { name: "Samsung Galaxy A54 / A55", brand: "samsung", defaultRes: "1080x2340" },
+            { name: "Samsung Galaxy A34 / A35", brand: "samsung", defaultRes: "1080x2340" },
+            { name: "Samsung Galaxy A14 / A15", brand: "samsung", defaultRes: "1080x2400" },
+
+            // Motorola / Realme / Oppo / Asus / Infinix
+            { name: "Motorola Edge 50 Pro / 40", brand: "motorola", defaultRes: "1220x2712" },
+            { name: "Moto G84 / G54", brand: "motorola", defaultRes: "1080x2400" },
+            { name: "Realme 12 Pro+ / GT Neo 5", brand: "realme", defaultRes: "1240x2772" },
+            { name: "Oppo Reno 10 / Find X6", brand: "oppo", defaultRes: "1080x2412" },
+            { name: "ASUS ROG Phone 8 Pro", brand: "asus", defaultRes: "1080x2400" },
+            { name: "Infinix Note 40 Pro", brand: "infinix", defaultRes: "1080x2436" }
+        ];
+
+        // Estado Global
+        let currentSelectedPhone = phoneDatabase[0];
+        let currentSensiType = 'media'; 
+        let auxilioType = 'medio';
+        let isAuxilioActive = true;
+        let selectedKeyDuration = '2h'; 
+
+        // Inicializar Lucide Icons
+        lucide.createIcons();
+
+        function switchMode(mode) {
+            const userSection = document.getElementById('section-user-flow');
+            const adminSection = document.getElementById('section-admin');
+            const btnUser = document.getElementById('btn-mode-user');
+            const btnAdmin = document.getElementById('btn-mode-admin');
+
+            if (mode === 'user') {
+                userSection.classList.remove('hidden');
+                adminSection.classList.add('hidden');
+                btnUser.className = "px-4 py-2 rounded-xl font-bold text-xs font-gamer tracking-wider uppercase transition-all flex items-center gap-2 border border-nu-purple bg-nu-purple/20 text-white shadow-neon-nu";
+                btnAdmin.className = "px-4 py-2 rounded-xl font-bold text-xs font-gamer tracking-wider uppercase transition-all flex items-center gap-2 border border-nu-border bg-nu-card text-gray-400 hover:text-white hover:border-nu-purple";
+            } else {
+                userSection.classList.add('hidden');
+                adminSection.classList.remove('hidden');
+                btnAdmin.className = "px-4 py-2 rounded-xl font-bold text-xs font-gamer tracking-wider uppercase transition-all flex items-center gap-2 border border-nu-purple bg-nu-purple/20 text-white shadow-neon-nu";
+                btnUser.className = "px-4 py-2 rounded-xl font-bold text-xs font-gamer tracking-wider uppercase transition-all flex items-center gap-2 border border-nu-border bg-nu-card text-gray-400 hover:text-white hover:border-nu-purple";
+                renderKeysTable();
+            }
+        }
+
+        function startIntroSequence() {
+            document.getElementById('screen-home').classList.add('hidden');
+            const screenIntro = document.getElementById('screen-intro');
+            screenIntro.classList.remove('hidden');
+
+            const container = document.getElementById('intro-text-container');
+            const phrases = [
+                "Tá sendo chamado de ruim pelo time?",
+                "Seus problemas acabaram.",
+                "Pois esse gerador é para VOCÊ."
+            ];
+
+            let index = 0;
+
+            function showNextPhrase() {
+                if (index < phrases.length) {
+                    container.innerHTML = `
+                        <h2 class="text-xl md:text-2xl font-bold font-gamer text-white animate-intro-text leading-snug">
+                            "${phrases[index]}"
+                        </h2>
+                    `;
+                    index++;
+                    setTimeout(showNextPhrase, 1000);
+                } else {
+                    screenIntro.classList.add('hidden');
+                    document.getElementById('screen-key').classList.remove('hidden');
+                }
+            }
+
+            showNextPhrase();
+        }
+
+        function getStoredKeys() {
+            const stored = localStorage.getItem('nubank_keys_db');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            const defaultKeys = [
+                { key: "DELKING-VIP", dur: "vitalicio", durText: "Vitalício", createdAt: Date.now(), expiresAt: null },
+                { key: "NUBANK-2H-TESTE", dur: "2h", durText: "2 Horas", createdAt: Date.now(), expiresAt: Date.now() + (2 * 60 * 60 * 1000) }
+            ];
+            localStorage.setItem('nubank_keys_db', JSON.stringify(defaultKeys));
+            return defaultKeys;
+        }
+
+        function saveKeys(keys) {
+            localStorage.setItem('nubank_keys_db', JSON.stringify(keys));
+        }
+
+        function verifyKey(event) {
+            event.preventDefault();
+            const inputKey = document.getElementById('keyInput').value.trim().toUpperCase();
+            const keyError = document.getElementById('keyError');
+
+            if (!inputKey) {
+                showKeyError("Por favor, digite uma key válida.");
+                return;
+            }
+
+            const keys = getStoredKeys();
+            const foundKey = keys.find(k => k.key === inputKey);
+
+            if (!foundKey) {
+                showKeyError("⚠️ Key não encontrada no sistema!");
+                return;
+            }
+
+            if (foundKey.expiresAt !== null && Date.now() > foundKey.expiresAt) {
+                showKeyError("⛔ Esta Key expirou! Gere uma nova no painel admin.");
+                return;
+            }
+
+            keyError.classList.add('hidden');
+            document.getElementById('screen-key').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.remove('hidden');
+            
+            selectPhone(phoneDatabase[0]);
+            generateAdaptedSensi();
+            showToast("Key autenticada com sucesso!");
+        }
+
+        function showKeyError(msg) {
+            const keyError = document.getElementById('keyError');
+            keyError.innerText = msg;
+            keyError.classList.remove('hidden');
+        }
+
+        function setKeyDuration(dur) {
+            selectedKeyDuration = dur;
+            document.querySelectorAll('.key-dur-btn').forEach(btn => {
+                btn.classList.remove('border-nu-purple', 'bg-nu-purple/20', 'text-white');
+                btn.classList.add('border-nu-border', 'bg-nu-bg', 'text-gray-400');
+            });
+
+            const activeBtn = document.getElementById(`btn-dur-${dur}`);
+            activeBtn.classList.add('border-nu-purple', 'bg-nu-purple/20', 'text-white');
+            activeBtn.classList.remove('border-nu-border', 'bg-nu-bg', 'text-gray-400');
+        }
+
+        function handleGenerateKey(e) {
+            e.preventDefault();
+            const prefix = document.getElementById('keyPrefixInput').value.trim().toUpperCase() || "NUBANK-";
+            const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const generatedKeyStr = `${prefix}${selectedKeyDuration.toUpperCase()}-${randomCode}`;
+
+            let expiresAt = null;
+            let durText = "Vitalício";
+
+            const now = Date.now();
+            if (selectedKeyDuration === '2h') {
+                expiresAt = now + (2 * 60 * 60 * 1000);
+                durText = "2 Horas";
+            } else if (selectedKeyDuration === '1d') {
+                expiresAt = now + (24 * 60 * 60 * 1000);
+                durText = "1 Dia";
+            } else if (selectedKeyDuration === '5d') {
+                expiresAt = now + (5 * 24 * 60 * 60 * 1000);
+                durText = "5 Dias";
+            }
+
+            const newKeyObj = {
+                key: generatedKeyStr,
+                dur: selectedKeyDuration,
+                durText: durText,
+                createdAt: now,
+                expiresAt: expiresAt
+            };
+
+            const keys = getStoredKeys();
+            keys.unshift(newKeyObj);
+            saveKeys(keys);
+
+            renderKeysTable();
+            showToast(`Key ${generatedKeyStr} criada com sucesso!`);
+        }
+
+        function deleteKey(keyStr) {
+            let keys = getStoredKeys();
+            keys = keys.filter(k => k.key !== keyStr);
+            saveKeys(keys);
+            renderKeysTable();
+            showToast("Key deletada!");
+        }
+
+        function clearAllKeys() {
+            if (confirm("Deseja apagar todas as keys registradas?")) {
+                localStorage.removeItem('nubank_keys_db');
+                renderKeysTable();
+                showToast("Histórico de keys foi limpo.");
+            }
+        }
+
+        function renderKeysTable() {
+            const container = document.getElementById('keysTableContainer');
+            const keys = getStoredKeys();
+
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-xs text-gray-500 font-mono">Nenhuma key encontrada.</div>`;
+                return;
+            }
+
+            const now = Date.now();
+
+            container.innerHTML = keys.map(k => {
+                const isExpired = k.expiresAt !== null && now > k.expiresAt;
+                const statusBadge = isExpired 
+                    ? `<span class="px-2 py-0.5 rounded bg-red-950/60 border border-red-500/40 text-red-400 text-[10px] font-bold">Expirada</span>`
+                    : `<span class="px-2 py-0.5 rounded bg-green-950/60 border border-green-500/40 text-green-400 text-[10px] font-bold">Ativa</span>`;
+
+                return `
+                    <div class="bg-nu-bg border border-nu-border/80 rounded-2xl p-3.5 flex items-center justify-between gap-3 text-left hover:border-nu-purple/50 transition-all">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-sm font-bold text-white tracking-wider">${k.key}</span>
+                                ${statusBadge}
+                            </div>
+                            <div class="text-[11px] text-gray-400 flex items-center gap-3 font-mono">
+                                <span>Validade: <strong class="text-nu-neon">${k.durText}</strong></span>
+                                <span>Criada: ${new Date(k.createdAt).toLocaleDateString('pt-BR')}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="copyText('${k.key}')" title="Copiar Key" class="p-2 rounded-xl bg-nu-card border border-nu-border text-gray-300 hover:text-white hover:border-nu-purple transition-all">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteKey('${k.key}')" title="Deletar Key" class="p-2 rounded-xl bg-red-950/40 border border-red-500/30 text-red-400 hover:bg-red-900/40 transition-all">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function filterPhones() {
+            const input = document.getElementById('phoneSearchInput').value.toLowerCase().trim();
+            const dropdown = document.getElementById('phoneDropdown');
+
+            if (!input) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+
+            const filtered = phoneDatabase.filter(p => p.name.toLowerCase().includes(input));
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = `<div class="p-3 text-xs text-gray-500 text-center">Modelo não listado (digite a resolução manualmente)</div>`;
+            } else {
+                dropdown.innerHTML = filtered.map(phone => `
+                    <div onclick="onSelectPhoneFromDropdown('${phone.name}')" class="p-3 hover:bg-nu-purple/20 cursor-pointer transition-all flex items-center justify-between text-xs text-left">
+                        <span class="font-semibold text-white">${phone.name}</span>
+                        <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-nu-bg text-nu-neon border border-nu-border">${phone.brand}</span>
+                    </div>
+                `).join('');
+            }
+
+            dropdown.classList.remove('hidden');
+        }
+
+        function onSelectPhoneFromDropdown(phoneName) {
+            const found = phoneDatabase.find(p => p.name === phoneName);
+            if (found) {
+                selectPhone(found);
+            }
+            document.getElementById('phoneDropdown').classList.add('hidden');
+        }
+
+        function selectPhone(phoneObj) {
+            currentSelectedPhone = phoneObj;
+            document.getElementById('phoneSearchInput').value = phoneObj.name;
+            document.getElementById('manualResolutionInput').value = phoneObj.defaultRes;
+            document.getElementById('resultPhoneModel').innerText = phoneObj.name;
+        }
+
+        function setSensiType(type) {
+            currentSensiType = type;
+            document.querySelectorAll('.sensi-type-btn').forEach(btn => {
+                btn.classList.remove('border-nu-purple', 'bg-nu-purple/20', 'text-white');
+                btn.classList.add('border-nu-border', 'bg-nu-bg', 'text-gray-400');
+            });
+
+            const activeBtn = document.getElementById(`btn-sensi-${type}`);
+            activeBtn.classList.add('border-nu-purple', 'bg-nu-purple/20', 'text-white');
+            activeBtn.classList.remove('border-nu-border', 'bg-nu-bg', 'text-gray-400');
+        }
+
+        function setAuxilioType(type) {
+            auxilioType = type;
+            document.querySelectorAll('.aux-type-btn').forEach(btn => {
+                btn.classList.remove('border-nu-purple', 'bg-nu-purple/20', 'text-white');
+                btn.classList.add('border-nu-border', 'bg-nu-bg', 'text-gray-400');
+            });
+
+            const activeBtn = document.getElementById(`btn-aux-${type}`);
+            activeBtn.classList.add('border-nu-purple', 'bg-nu-purple/20', 'text-white');
+            activeBtn.classList.remove('border-nu-border', 'bg-nu-bg', 'text-gray-400');
+        }
+
+        function toggleAuxilioMira() {
+            isAuxilioActive = document.getElementById('auxilioToggle').checked;
+            const container = document.getElementById('auxilioOptionsContainer');
+            if (isAuxilioActive) {
+                container.classList.remove('opacity-40', 'pointer-events-none');
+            } else {
+                container.classList.add('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateAdaptedSensi() {
+            const userResStr = document.getElementById('manualResolutionInput').value.trim();
+            
+            // Intervalos por nível de sensi
+            let minVal = 130, maxVal = 150;
+            if (currentSensiType === 'alta') { minVal = 175; maxVal = 200; }
+            else if (currentSensiType === 'baixa') { minVal = 90; maxVal = 120; }
+
+            // Cálculo dos valores de Mira
+            const geral = getRandomInt(minVal, maxVal);
+            const redDot = getRandomInt(Math.max(80, minVal - 10), maxVal);
+            const m2x = getRandomInt(Math.max(75, minVal - 15), maxVal);
+            const m4x = getRandomInt(Math.max(70, minVal - 20), maxVal);
+            const awm = getRandomInt(40, 85);
+            const olhadinha = getRandomInt(50, 100);
+
+            // Cálculo da DPI baseado na resolução digitada
+            let baseDpi = 560;
+            const resParts = userResStr.split('x').map(n => parseInt(n.trim()));
+            if (resParts.length === 2 && !isNaN(resParts[0]) && !isNaN(resParts[1])) {
+                const totalPixels = resParts[0] * resParts[1];
+                if (totalPixels > 3000000) baseDpi = 680;      // Alta densidade
+                else if (totalPixels < 1500000) baseDpi = 480; // Baixa densidade
+            }
+
+            // Ajuste do Botão de Atirar e Auxílio de Toque
+            let botaoAtirar = getRandomInt(45, 56);
+            let velocidadePonteiro = "Máxima (10/10)";
+            let delayToque = "Curto (0.5s)";
+
+            if (isAuxilioActive) {
+                if (auxilioType === 'suave') {
+                    botaoAtirar += 4; // Botão maior para estabilidade
+                    velocidadePonteiro = "Média-Alta (8/10) - Estável";
+                    delayToque = "Médio (0.7s) - Trava Mira";
+                } else if (auxilioType === 'extreme') {
+                    botaoAtirar -= 3; // Botão menor para subida veloz
+                    velocidadePonteiro = "Máxima + Calibração Rápida";
+                    delayToque = "Mínimo (0.1s / 100ms)";
+                } else {
+                    velocidadePonteiro = "Equilibrada (9/10)";
+                    delayToque = "Curto (0.3s)";
+                }
+            }
+
+            // Atualização do DOM
+            document.getElementById('resGeral').innerText = geral;
+            document.getElementById('resRedDot').innerText = redDot;
+            document.getElementById('res2x').innerText = m2x;
+            document.getElementById('res4x').innerText = m4x;
+            document.getElementById('resAwm').innerText = awm;
+            document.getElementById('resOlhadinha').innerText = olhadinha;
+            document.getElementById('resBotao').innerText = `${botaoAtirar}%`;
+            document.getElementById('resPonteiro').innerText = velocidadePonteiro;
+            document.getElementById('resDelay').innerText = delayToque;
+
+            const dpiLabel = document.getElementById('labelDpi');
+            if (currentSelectedPhone.brand === 'apple') {
+                dpiLabel.innerText = 'Cursor iOS';
+                document.getElementById('resDpi').innerText = auxilioType === 'extreme' ? 'Velocidade 120 (Individual)' : 'Velocidade 100';
+            } else {
+                dpiLabel.innerText = 'DPI Recomendada';
+                document.getElementById('resDpi').innerText = `${baseDpi} DPI`;
+            }
+
+            document.getElementById('resultPhoneModel').innerText = `${currentSelectedPhone.name} (${userResStr})`;
+        }
+
+        function copyToClipboard() {
+            const phone = document.getElementById('resultPhoneModel').innerText;
+            const geral = document.getElementById('resGeral').innerText;
+            if (geral === '--') return;
+
+            const redDot = document.getElementById('resRedDot').innerText;
+            const m2x = document.getElementById('res2x').innerText;
+            const m4x = document.getElementById('res4x').innerText;
+            const awm = document.getElementById('resAwm').innerText;
+            const olhadinha = document.getElementById('resOlhadinha').innerText;
+            const botao = document.getElementById('resBotao').innerText;
+            const dpi = document.getElementById('resDpi').innerText;
+            const ponteiro = document.getElementById('resPonteiro').innerText;
+            const delay = document.getElementById('resDelay').innerText;
+
+            const formattedText = `📱 *NUBANK SENSI - ${phone.toUpperCase()}* 📱
+----------------------------------
+• Geral: ${geral}
+• Red Dot: ${redDot}
+• Mira 2X: ${m2x}
+• Mira 4X: ${m4x}
+• Mira AWM: ${awm}
+• Olhadinha: ${olhadinha}
+----------------------------------
+⚙️ Configurações & Auxílio de Mira:
+• Botão de Atirar: ${botao}
+• ${document.getElementById('labelDpi').innerText}: ${dpi}
+• Velocidade do Ponteiro: ${ponteiro}
+• Atraso do Toque: ${delay}
+----------------------------------
+Criado por @delk1ng`;
+
+            copyText(formattedText);
+        }
+
+        function copyText(text) {
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            showToast("Copiado com sucesso!");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
